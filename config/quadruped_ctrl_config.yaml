@@ -1,0 +1,28 @@
+simulation:
+  terrain: "stairs"
+  lateralFriction: 1.0
+  spinningFriction: 0.0065
+  freq: 500.0
+  stand_kp: 100.0
+  stand_kd: 1.0
+  joint_kp: 0.0
+  joint_kd: 0.05
+robot:
+  freq: 500.0
+  stand_kp: 100.0
+  stand_kd: 1.0
+  joint_kp: 10.0
+  joint_kd: 0.2
+
+  #---- Robot dim and dimensions ----#
+  body_mass: 15.0 #in kg
+  body_length: 0.492 #in meter //0.246*2
+  body_width: 0.11 # in meter //0.055 * 2
+  body_height: 0.19 # in meter //  0.095 * 2
+  abad_gear_ratio: 9 # INFO
+  
+  
+
+  #---- GAIT Parameters ----#
+  swing_height: 0.02 #Set the maximum height of the swing
+
