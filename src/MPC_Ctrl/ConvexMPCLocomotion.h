@@ -8,7 +8,8 @@
 #include "Gait.h"
 #include <fstream> 
 #include <sys/time.h>
-
+#include <WBC_Ctrl/WBC_Ctrl.hpp>
+#include <WBC_Ctrl/LocomotionCtrl/LocomotionCtrl.hpp>
 #include <cstdio>
 #include <vector>
 
@@ -91,7 +92,7 @@ public:
 
   template<typename T>
   void run(Quadruped<T> &_quadruped, LegController<T> &_legController, StateEstimatorContainer<float> &_stateEstimator,
-          DesiredStateCommand<T> &_desiredStateCommand, std::vector<double> gamepadCommand, int gaitType, int robotMode = 0);
+          DesiredStateCommand<T> &_desiredStateCommand, std::vector<double> gamepadCommand, int gaitType);
   // void _SetupCommand(StateEstimatorContainer<float> &_stateEstimator, std::vector<double> gamepadCommand);
   bool currently_jumping = false;
 
@@ -109,11 +110,16 @@ public:
   Vec3<float> Fr_des[4];
 
   Vec4<float> contact_state;
+  Vec3<float> pDes_backup[4];
+  Vec3<float> vDes_backup[4];
+  Mat3<float> Kp_backup[4];
+  Mat3<float> Kd_backup[4];
 
 private:
   void _SetupCommand(StateEstimatorContainer<float> &_stateEstimator, std::vector<double> gamepadCommand);
-
-  float _yaw_turn_rate = 0.;
+  WBC_Ctrl<float> * _wbc_ctrl;
+  LocomotionCtrlData<float> * _wbc_data;
+  float _yaw_turn_rate;
   float _yaw_des;
 
   float _roll_des;
@@ -124,9 +130,9 @@ private:
 
   // High speed running
   //float _body_height = 0.34;
-  float _body_height = 0.29;
+  float _body_height = 0.35;
 
-  float _body_height_running = 0.29;
+  float _body_height_running = 0.35;
   float _body_height_jumping = 0.36;
 
   void recompute_timing(int iterations_per_mpc);
@@ -143,8 +149,8 @@ private:
   Vec3<float> f_ff[4];
   Vec4<float> swingTimes;
   FootSwingTrajectory<float> footSwingTrajectories[4];
-  OffsetDurationGait aio, trotting, bounding, pronking, jumping, galloping, standing, trotRunning, walking, walking2, pacing;
-  // MixedFrequncyGait random, random2;
+  OffsetDurationGait trotting, bounding, pronking, jumping, galloping, standing, trotRunning, walking, walking2, pacing;
+  MixedFrequncyGait random, random2;
   Mat3<float> Kp, Kd, Kp_stance, Kd_stance, Kp1;
   bool firstRun = true;
   bool firstSwing[4];  //true
@@ -153,13 +159,14 @@ private:
   int current_gait;
   int gaitNumber;
 
+
   Vec3<float> world_position_desired;
   Vec3<float> rpy_int;
   Vec3<float> rpy_comp;
   float x_comp_integral = 0;
   Vec3<float> pFoot[4];
   CMPC_Result<float> result;
-  float trajAll[20*36];
+  float trajAll[12*36];
   float myflags = 0;
 
   CMPC_Jump jump_state;

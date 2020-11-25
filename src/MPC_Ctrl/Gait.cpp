@@ -1,30 +1,11 @@
 #include "Gait.h"
-#include <iostream>
 
 // Offset - Duration Gait
-OffsetDurationGait::OffsetDurationGait(int nSegment, Vec4<int> offsets, Vec4<int> durations, const std::string &name = "walk") :
+OffsetDurationGait::OffsetDurationGait(int nSegment, Vec4<int> offsets, Vec4<int> durations, const std::string &name) :
   _offsets(offsets.array()),
   _durations(durations.array()),
   _nIterations(nSegment)  //10
 {
-
-  // _name = name;
-  // // allocate memory for MPC gait table
-  // _mpc_table = new int[nSegment * 4];
-
-  // _offsetsFloat = offsets.cast<float>() / (float) nSegment;
-  // _durationsFloat = durations.cast<float>() / (float) nSegment;
-
-  // _stance = durations[0];
-  // _swing = nSegment - durations[0];
-  setGaitParam(nSegment, offsets, durations, name);
-}
-
-void OffsetDurationGait::setGaitParam(int nSegment, Vec4<int> offsets, Vec4<int> durations, const std::string& name = "walk") {
-
-  _offsets = offsets.array();
-  _durations = durations.array();
-  _nIterations = nSegment;
 
   _name = name;
   // allocate memory for MPC gait table
@@ -155,13 +136,14 @@ int* OffsetDurationGait::getMpcTable()
     }
     // printf("\n");
   }
-  // printf("\n");
+
+
 
   return _mpc_table;
 }
 
 int* MixedFrequncyGait::getMpcTable() {
-  // printf("MPC table (%d):\n", _iteration);
+  //printf("MPC table (%d):\n", _iteration);
   for(int i = 0; i < _nIterations; i++) {
     for(int j = 0; j < 4; j++) {
       int progress = (i + _iteration + 1) % _periods[j];  // progress
@@ -183,8 +165,6 @@ void OffsetDurationGait::setIterations(int iterationsPerMPC, int currentIteratio
 {
   _iteration = (currentIteration / iterationsPerMPC) % _nIterations;
   _phase = (float)(currentIteration % (iterationsPerMPC * _nIterations)) / (float) (iterationsPerMPC * _nIterations);
-  // std::cout << "currentIteration = " << currentIteration  << " iterationsPerMPC = " << iterationsPerMPC << std::endl;
-  // std::cout << "_nIterations = " << _nIterations << " _iteration = " << _iteration << " _phase = " << _phase << std::endl;
 }
 
 void MixedFrequncyGait::setIterations(int iterationsBetweenMPC, int currentIteration) {
@@ -199,11 +179,11 @@ void MixedFrequncyGait::setIterations(int iterationsBetweenMPC, int currentItera
 
 }
 
-float OffsetDurationGait::getCurrentGaitPhase() {
-  return _phase;
+int OffsetDurationGait::getCurrentGaitPhase() {
+  return _iteration;
 }
 
-float MixedFrequncyGait::getCurrentGaitPhase() {
+int MixedFrequncyGait::getCurrentGaitPhase() {
   return 0;
 }
 
@@ -223,14 +203,6 @@ float OffsetDurationGait::getCurrentStanceTime(float dtMPC, int leg) {
 
 float MixedFrequncyGait::getCurrentStanceTime(float dtMPC, int leg) {
   return dtMPC * _duty_cycle * _periods[leg];
-}
-
-int OffsetDurationGait::getGaitHorizon() {
-  return _nIterations;
-}
-
-int MixedFrequncyGait::getGaitHorizon() {
-  return _nIterations;
 }
 
 void OffsetDurationGait::debugPrint() {

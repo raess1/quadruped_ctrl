@@ -97,10 +97,10 @@ void c2qp(Matrix<fpt,13,13> Ac, Matrix<fpt,13,12> Bc,fpt dt,s16 horizon)
   cout<<"Adt: \n"<<Adt<<"\nBdt:\n"<<Bdt<<endl;
 #endif
   if(horizon > 19) {
-    // throw std::runtime_error("horizon is too long!");
+    throw std::runtime_error("horizon is too long!");
   }
 
-  Matrix<fpt,13,13> powerMats[100];
+  Matrix<fpt,13,13> powerMats[20];
   powerMats[0].setIdentity();
   for(int i = 1; i < horizon+1; i++) {
     powerMats[i] = Adt * powerMats[i-1];
@@ -382,8 +382,8 @@ void solve_mpc(update_data_t* update, problem_setup* setup)
 
   // start = clock();
 
-  // qH = B_qp.transpose()*S;
-  // qH = qH*B_qp;
+  qH = B_qp.transpose()*S;
+  qH = qH*B_qp;
 
   // std::cout << "111111111111111111 : " << B_qp.rows() << "  2222222222222222 :" << B_qp.cols() << std::endl;
   // std::cout << "222222222222222222 : " << S << std::endl;

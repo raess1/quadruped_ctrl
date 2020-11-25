@@ -11,15 +11,13 @@ class Gait {
 public:
   virtual ~Gait() = default;
 
-  virtual void setGaitParam(int nSegment, Vec4<int> offsets, Vec4<int> durations, const std::string& name = "walk") = 0;
   virtual Vec4<float> getContactState() = 0;
   virtual Vec4<float> getSwingState() = 0;
   virtual int* getMpcTable() = 0;
   virtual void setIterations(int iterationsBetweenMPC, int currentIteration) = 0;
   virtual float getCurrentStanceTime(float dtMPC, int leg) = 0;
   virtual float getCurrentSwingTime(float dtMPC, int leg) = 0;
-  virtual float getCurrentGaitPhase() = 0;
-  virtual int getGaitHorizon() = 0;
+  virtual int getCurrentGaitPhase() = 0;
   virtual void debugPrint() { }
 
 protected:
@@ -33,15 +31,13 @@ class OffsetDurationGait : public Gait {
 public:
   OffsetDurationGait(int nSegment, Vec4<int> offset, Vec4<int> durations, const std::string& name);
   ~OffsetDurationGait();
-  void setGaitParam(int nSegment, Vec4<int> offset, Vec4<int> durations, const std::string& name);
   Vec4<float> getContactState();
   Vec4<float> getSwingState();
   int* getMpcTable();
   void setIterations(int iterationsBetweenMPC, int currentIteration);
   float getCurrentStanceTime(float dtMPC, int leg);
   float getCurrentSwingTime(float dtMPC, int leg);
-  float getCurrentGaitPhase();
-  int getGaitHorizon();
+  int getCurrentGaitPhase();
   void debugPrint();
 
 private:
@@ -69,8 +65,7 @@ public:
   void setIterations(int iterationsBetweenMPC, int currentIteration);
   float getCurrentStanceTime(float dtMPC, int leg);
   float getCurrentSwingTime(float dtMPC, int leg);
-  float getCurrentGaitPhase();
-  int getGaitHorizon();
+  int getCurrentGaitPhase();
   void debugPrint();
 
 private:

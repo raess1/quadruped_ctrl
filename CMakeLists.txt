@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(quadruped_ctrl)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-#add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 set(CMAKE_BUILD_TYPE "Release")
 #set(BUILD_TYPE_RELEASE True)
@@ -123,12 +123,20 @@ include_directories(${catkin_INCLUDE_DIRS}
   include/${PROJECT_NAME}
   src
 )
+include_directories("/usr/local/include/eigen3")
+## Declare a C++ library
+
 
 add_subdirectory(src/qpOASES)
 add_subdirectory(src/JCQP)
 add_subdirectory(src/osqp)
+add_subdirectory(src/Goldfarb_Optimizer)
+#add_subdirectory(src/WBC)
+#add_subdirectory(src/WBC_Ctrl)
+add_subdirectory(src/inih)
+add_subdirectory(src/ParamHandler)
+#add_subdirectory(src/common)
 
-## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/MPC_Ctrl/ConvexMPCLocomotion.cpp
   src/MPC_Ctrl/Gait.cpp
@@ -145,19 +153,31 @@ add_library(${PROJECT_NAME}
   src/Controllers/PositionVelocityEstimator.cpp
   src/Dynamics/Quadruped.cpp
   src/Dynamics/FloatingBaseModel.cpp
-  src/GaitCtrller.cpp
+  src/WBC/WBIC/KinWBC.cpp
+  src/WBC/WBIC/WBIC.cpp
+  src/WBC_Ctrl/WBC_Ctrl.cpp
+  src/WBC_Ctrl/ContactSet/FixedBodyContact.cpp
+  src/WBC_Ctrl/ContactSet/SingleContact.cpp
+  src/WBC_Ctrl/LocomotionCtrl/LocomotionCtrl.cpp
+  src/WBC_Ctrl/TaskSet/BodyOriTask.cpp
+  src/WBC_Ctrl/TaskSet/BodyPosTask.cpp
+  src/WBC_Ctrl/TaskSet/BodyPostureTask.cpp
+  src/WBC_Ctrl/TaskSet/BodyRyRzTask.cpp
+  src/WBC_Ctrl/TaskSet/JPosTask.cpp
+  src/WBC_Ctrl/TaskSet/LinkPosTask.cpp
+  src/WBC_Ctrl/TaskSet/LocalHeadPosTask.cpp
+  src/WBC_Ctrl/TaskSet/LocalPosTask.cpp
+  src/WBC_Ctrl/TaskSet/LocalRollTask.cpp
+  src/WBC_Ctrl/TaskSet/LocalTailPosTask.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-  JCQP
-  qpOASES
-  osqp
-)
-
-# add_executable(mainController src/mainController.cpp)
-# target_link_libraries(mainController ${catkin_LIBRARIES} ${PROJECT_NAME})
-# add_dependencies(mainController ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(mainController src/mainController.cpp)
+target_link_libraries(mainController ${catkin_LIBRARIES} ${PROJECT_NAME})
+target_link_libraries(mainController dynacore_param_handler qpOASES)
+target_link_libraries(mainController Goldfarb_Optimizer osqp)
+#target_link_libraries(mainController WBC_Ctrl biomimetics)
+target_link_libraries(mainController JCQP)
+add_dependencies(mainController ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -195,6 +215,7 @@ target_link_libraries(${PROJECT_NAME}
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
    scripts/walking_simulation.py 
+   scripts/plotData.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
